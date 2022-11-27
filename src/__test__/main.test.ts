@@ -233,7 +233,9 @@ describe("init", () => {
 
     //Act/Agera på funktion
     functions.init();
-    document.getElementById("newTodoForm")?.dispatchEvent(new Event("submit"));
+    document
+      .getElementById("newTodoForm")
+      ?.dispatchEvent(new SubmitEvent("submit"));
 
     //Assert/Verifiera resultat
     expect(createNewTodoSpy).toHaveBeenCalledTimes(1);
