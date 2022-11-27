@@ -5,7 +5,6 @@
 import * as functions from "../ts/main";
 import * as functionfromfunctions from "../ts/functions";
 import { expect, describe, test, jest, beforeEach } from "@jest/globals";
-import { IAddResponse } from "../ts/models/IAddResult";
 import { Todo } from "../ts/models/Todo";
 
 describe("createNewTodo", () => {
@@ -60,21 +59,6 @@ describe("createHtml", () => {
     expect(ulTag.innerHTML).toBe(
       `<li class=\"todo__text\">lära mig koda</li><li class=\"todo__text\">lära mig testning</li>`
     );
-  });
-
-  test("should add todo-item to localStorage", () => {
-    //Arrange/Förutsättningar
-    let christmasTodos: Todo[] = JSON.parse(
-      localStorage.getItem("todos") || "[]"
-    );
-    christmasTodos.splice(0, christmasTodos.length);
-
-    //Act/Agera på funktion
-    christmasTodos.push(new Todo("köpa julblommor", false));
-    functions.createHtml(christmasTodos);
-
-    //Assert/Verifiera resultat
-    expect(christmasTodos.length).toBe(1);
   });
 
   test("should add class todo__text--done when li is clicked", () => {
@@ -135,8 +119,10 @@ describe("toggleTodo", () => {
       .spyOn(functionfromfunctions, "changeTodo")
       .mockReturnValue();
     let spy2 = jest.spyOn(functions, "createHtml").mockReturnValue();
+
     //Act/Agera på funktion
     functions.toggleTodo(myToDo);
+
     //Assert/Verifiera resultat
     expect(spy1).toHaveBeenCalled();
     expect(spy2).toHaveBeenCalled();
@@ -213,7 +199,9 @@ describe("init", () => {
     document.body.innerHTML = `<ul id="todos" class="todo"></ul><button type="button" id="clearTodos">Rensa lista</button>`;
     let spyButton = jest.spyOn(functions, "clearTodos").mockReturnValue();
     functions.init();
+
     //Act/Agera på funktion
+
     document.getElementById("clearTodos")?.click();
     //Assert/Verifiera resultat
     expect(spyButton).toHaveBeenCalledTimes(1);
@@ -224,7 +212,9 @@ describe("init", () => {
     document.body.innerHTML = `<ul id="todos" class="todo"></ul><button type="button" id="clearTodos">Rensa lista</button>`;
     let spyButton = jest.spyOn(functions, "clearTodos").mockReturnValue();
     functions.init();
+
     //Act/Agera på funktion
+
     document.getElementById("clearTodos")?.click();
     //Assert/Verifiera resultat
     expect(spyButton).toHaveBeenCalledTimes(1);
@@ -282,6 +272,7 @@ describe("sortToDoList", () => {
     ];
     //Act/Agera på funktion
     functions.sortToDoList(christmasGifts);
+
     //Assert/Verifiera resultat
     expect(christmasGifts[0].text).toBe("atlaskartbok");
     expect(christmasGifts[1].text).toBe("dyson air wrap");
