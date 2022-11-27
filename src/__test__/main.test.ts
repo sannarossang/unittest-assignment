@@ -36,8 +36,6 @@ describe("createNewTodo", () => {
     //Assert/Verifiera resultat
     expect(spy).toHaveBeenCalled();
   });
-
-  //testa addToDo?
 });
 
 describe("createHtml", () => {
@@ -45,6 +43,7 @@ describe("createHtml", () => {
     jest.resetModules();
     jest.restoreAllMocks();
   });
+
   test("should create html for li-element and add to ul-list", () => {
     //Arrange/Förutsättningar
     document.body.innerHTML = `<ul id="todos" class="todo"></ul>`;
@@ -63,7 +62,64 @@ describe("createHtml", () => {
     );
   });
 
-  test("should make list in HTML with done tasks", () => {});
+  test("should add todo-item to localStorage", () => {
+    //Arrange/Förutsättningar
+    let christmasTodos: Todo[] = JSON.parse(
+      localStorage.getItem("todos") || "[]"
+    );
+    christmasTodos.splice(0, christmasTodos.length);
+
+    //Act/Agera på funktion
+    christmasTodos.push(new Todo("köpa julblommor", false));
+    functions.createHtml(christmasTodos);
+
+    //Assert/Verifiera resultat
+    expect(christmasTodos.length).toBe(1);
+  });
+
+  test("should add class todo__text--done when li is clicked", () => {
+    //Arrange/Förutsättningar
+    let doneToDolist: Todo[] = [
+      new Todo("julpynta", true),
+      new Todo("klara funktionstester", true),
+      new Todo("borsta tänderna", true),
+      new Todo("äta frukost", true),
+    ];
+    document.body.innerHTML = `<ul id="todos" class="todo"></ul>`;
+
+    //Act/Agera på funktion
+    functions.createHtml(doneToDolist);
+
+    //Assert/Verifiera resultat
+    let todosContainer: HTMLUListElement = document.getElementById(
+      "todos"
+    ) as HTMLUListElement;
+    expect(
+      todosContainer.children[0].classList.contains("todo__text--done")
+    ).toBe(true);
+  });
+
+  test("should call on toggleTodo when li-element is clicked", () => {
+    //Arrange/Förutsättningar
+    let doneToDolist: Todo[] = [
+      new Todo("julpynta", true),
+      new Todo("klara funktionstester", true),
+      new Todo("borsta tänderna", true),
+      new Todo("äta frukost", true),
+    ];
+    document.body.innerHTML = `<ul id="todos" class="todo"></ul>`;
+    let spyDoneTasks = jest.spyOn(functions, "toggleTodo").mockReturnValue();
+
+    //Act/Agera på funktion
+    functions.createHtml(doneToDolist);
+    let liDoneTasks: HTMLElement = document.getElementsByClassName(
+      "todo__text--done"
+    )[0] as HTMLElement;
+    liDoneTasks.click();
+
+    //Assert/Verifiera resultat
+    expect(spyDoneTasks).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("toggleTodo", () => {
@@ -71,6 +127,7 @@ describe("toggleTodo", () => {
     jest.resetModules();
     jest.restoreAllMocks();
   });
+
   test("should call changeTodo and createHtml", () => {
     //Arrange/Förutsättningar
     let myToDo: Todo = new Todo("julpynta", false);
@@ -91,6 +148,7 @@ describe("displayError", () => {
     jest.resetModules();
     jest.restoreAllMocks();
   });
+
   test("should display error message and class show", () => {
     //Arrange/Förutsättningar
     let errorMessage: string = "mitt felmeddelande";
@@ -126,6 +184,7 @@ describe("clearTodos", () => {
     jest.resetModules();
     jest.restoreAllMocks();
   });
+
   test("should call removeAllTodos and createHtml", () => {
     //Arrange/Förutsättningar
     let myXmasList: Todo[] = [new Todo("julstäda", false)];
@@ -133,8 +192,10 @@ describe("clearTodos", () => {
       .spyOn(functionfromfunctions, "removeAllTodos")
       .mockReturnValue();
     let spy2 = jest.spyOn(functions, "createHtml").mockReturnValue();
+
     //Act/Agera på funktion
     functions.clearTodos(myXmasList);
+
     //Assert/Verifiera resultat
     expect(spy1).toHaveBeenCalled();
     expect(spy2).toHaveBeenCalled();
@@ -146,6 +207,7 @@ describe("init", () => {
     jest.resetModules();
     jest.restoreAllMocks();
   });
+
   test("should click button with name Rensa lista", () => {
     //Arrange/Förutsättningar
     document.body.innerHTML = `<ul id="todos" class="todo"></ul><button type="button" id="clearTodos">Rensa lista</button>`;
@@ -154,7 +216,7 @@ describe("init", () => {
     //Act/Agera på funktion
     document.getElementById("clearTodos")?.click();
     //Assert/Verifiera resultat
-    expect(spyButton).toHaveBeenCalledTimes(1); //should be 1?
+    expect(spyButton).toHaveBeenCalledTimes(1);
   });
 
   test("should click button with name Skapa", () => {
@@ -165,7 +227,27 @@ describe("init", () => {
     //Act/Agera på funktion
     document.getElementById("clearTodos")?.click();
     //Assert/Verifiera resultat
-    expect(spyButton).toHaveBeenCalledTimes(1); //should be 1? toHaveBeenCalledTimes(1)
+    expect(spyButton).toHaveBeenCalledTimes(1);
+  });
+
+  test("should be able to click button with name submit", () => {
+    //Arrange/Förutsättningar
+    document.body.innerHTML = `<form id="newTodoForm">
+    <div>
+      <input type="text" id="newTodoText" />
+      <button>Skapa</button></div></form>`;
+    let createNewTodoSpy = jest
+      .spyOn(functions, "createNewTodo")
+      .mockReturnValue();
+    let createHtmlSpy = jest.spyOn(functions, "createHtml").mockReturnValue();
+
+    //Act/Agera på funktion
+    functions.init();
+    document.getElementById("newTodoForm")?.dispatchEvent(new Event("submit"));
+
+    //Assert/Verifiera resultat
+    expect(createNewTodoSpy).toHaveBeenCalledTimes(1);
+    expect(createHtmlSpy).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -174,6 +256,7 @@ describe("sortToDoList", () => {
     jest.resetModules();
     jest.restoreAllMocks();
   });
+
   test("should click button with name Sortera a till ö", () => {
     //Arrange/Förutsättningar
     document.body.innerHTML = `<ul id="todos" class="todo"></ul>   <button type="button" id="btn-sort">Sortera a till ö</button>`;
@@ -184,9 +267,11 @@ describe("sortToDoList", () => {
 
     //Act/Agera på funktion
     document.getElementById("btn-sort")?.click();
+
     //Assert/Verifiera resultat
-    expect(spyMySortListButton).toHaveBeenCalledTimes(1); ////should be 1? toHaveBeenCalledTimes(1)
+    expect(spyMySortListButton).toHaveBeenCalledTimes(1);
   });
+
   test("should sort todo list in alphabetic order", () => {
     //Arrange/Förutsättningar
     let christmasGifts: Todo[] = [
