@@ -62,6 +62,8 @@ describe("createHtml", () => {
       `<li class=\"todo__text\">lära mig koda</li><li class=\"todo__text\">lära mig testning</li>`
     );
   });
+
+  test("should make list in HTML with done tasks", () => {});
 });
 
 describe("toggleTodo", () => {
@@ -85,6 +87,10 @@ describe("toggleTodo", () => {
 });
 
 describe("displayError", () => {
+  beforeEach(() => {
+    jest.resetModules();
+    jest.restoreAllMocks();
+  });
   test("should display error message and class show", () => {
     //Arrange/Förutsättningar
     let errorMessage: string = "mitt felmeddelande";
@@ -132,5 +138,68 @@ describe("clearTodos", () => {
     //Assert/Verifiera resultat
     expect(spy1).toHaveBeenCalled();
     expect(spy2).toHaveBeenCalled();
+  });
+});
+
+describe("init", () => {
+  beforeEach(() => {
+    jest.resetModules();
+    jest.restoreAllMocks();
+  });
+  test("should click button with name Rensa lista", () => {
+    //Arrange/Förutsättningar
+    document.body.innerHTML = `<ul id="todos" class="todo"></ul><button type="button" id="clearTodos">Rensa lista</button>`;
+    let spyButton = jest.spyOn(functions, "clearTodos").mockReturnValue();
+    functions.init();
+    //Act/Agera på funktion
+    document.getElementById("clearTodos")?.click();
+    //Assert/Verifiera resultat
+    expect(spyButton).toHaveBeenCalledTimes(1); //should be 1?
+  });
+
+  test("should click button with name Skapa", () => {
+    //Arrange/Förutsättningar
+    document.body.innerHTML = `<ul id="todos" class="todo"></ul><button type="button" id="clearTodos">Rensa lista</button>`;
+    let spyButton = jest.spyOn(functions, "clearTodos").mockReturnValue();
+    functions.init();
+    //Act/Agera på funktion
+    document.getElementById("clearTodos")?.click();
+    //Assert/Verifiera resultat
+    expect(spyButton).toHaveBeenCalledTimes(1); //should be 1? toHaveBeenCalledTimes(1)
+  });
+});
+
+describe("sortToDoList", () => {
+  beforeEach(() => {
+    jest.resetModules();
+    jest.restoreAllMocks();
+  });
+  test("should click button with name Sortera a till ö", () => {
+    //Arrange/Förutsättningar
+    document.body.innerHTML = `<ul id="todos" class="todo"></ul>   <button type="button" id="btn-sort">Sortera a till ö</button>`;
+    let spyMySortListButton = jest
+      .spyOn(functions, "sortToDoList")
+      .mockReturnValue();
+    functions.init();
+
+    //Act/Agera på funktion
+    document.getElementById("btn-sort")?.click();
+    //Assert/Verifiera resultat
+    expect(spyMySortListButton).toHaveBeenCalledTimes(1); ////should be 1? toHaveBeenCalledTimes(1)
+  });
+  test("should sort todo list in alphabetic order", () => {
+    //Arrange/Förutsättningar
+    let christmasGifts: Todo[] = [
+      new Todo("elcykel", false),
+      new Todo("elcykel", false),
+      new Todo("dyson air wrap", false),
+      new Todo("atlaskartbok", false),
+    ];
+    //Act/Agera på funktion
+    functions.sortToDoList(christmasGifts);
+    //Assert/Verifiera resultat
+    expect(christmasGifts[0].text).toBe("atlaskartbok");
+    expect(christmasGifts[1].text).toBe("dyson air wrap");
+    expect(christmasGifts[2].text).toBe("elcykel");
   });
 });

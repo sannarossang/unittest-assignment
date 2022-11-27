@@ -3,13 +3,17 @@ import { Todo } from "./models/Todo";
 
 window.onload = function () {
   init();
+  createHtml(todos);
 };
 
 let todos: Todo[] = JSON.parse(localStorage.getItem("todos") || "[]");
 
 export function init() {
   document.getElementById("clearTodos")?.addEventListener("click", () => {
-    clearTodos(todos);
+    exports.clearTodos(todos);
+  });
+  document.getElementById("btn-sort")?.addEventListener("click", () => {
+    exports.sortToDoList(todos);
   });
 
   (document.getElementById("newTodoForm") as HTMLFormElement)?.addEventListener(
@@ -22,7 +26,7 @@ export function init() {
       ).value;
       console.log("Todos when creating", todos);
 
-      createNewTodo(todoText, todos);
+      exports.createNewTodo(todoText, todos);
     }
   );
   exports.createHtml(todos);
@@ -86,4 +90,18 @@ export function displayError(error: string, show: boolean) {
 export function clearTodos(todos: Todo[]) {
   removeAllTodos(todos);
   exports.createHtml(todos);
+}
+
+export function sortToDoList(todos: Todo[]) {
+  todos.sort((a, b) => {
+    if (a.text.toLowerCase() < b.text.toLowerCase()) {
+      return -1;
+    }
+    if (a.text.toLowerCase() === b.text.toLowerCase()) {
+      return 0;
+    } else {
+      return +1;
+    }
+  });
+  createHtml(todos);
 }
